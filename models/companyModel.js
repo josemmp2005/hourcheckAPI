@@ -3,7 +3,7 @@ export const CompanyModel = {
     fields: {
         id: "serial",
         name: "string",
-        direction: "text",
+        address: "text",
         phone: "string",
         email: "string",
         created_at: "timestamp"

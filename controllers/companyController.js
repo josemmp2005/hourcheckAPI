@@ -17,11 +17,11 @@ export const getCompanies = async(req, res) => {
 
 export const createCompany = async(req, res) => {
     try {
-        const { name, address, direction, phone, email } = req.body;
+        const { name, address, phone, email } = req.body;
 
         const { data, error } = await supabase
             .from(CompanyModel.table)
-            .insert([{ name, address, direction, phone, email }]);
+            .insert([{ name, address, phone, email }]);
 
         if (error) throw error;
 

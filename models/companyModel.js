@@ -6,6 +6,7 @@ export const CompanyModel = {
         address: "text",
         phone: "string",
         email: "string",
+        photo_url: "string",
         created_at: "timestamp"
     }
 };

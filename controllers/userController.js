@@ -21,8 +21,7 @@ export const getUsers = async(req, res) => {
 };
 
 export const createUser = async(req, res) => {
-    const { name, email, password_hash, company_id } = req.body;
-    // console.log("Received data:", req.body);
+    const { name, email, password_hash, active, photo_url } = req.body;
     if (!password_hash) {
         return res.status(400).json({ error: "Password is required" });
     }
@@ -47,11 +46,11 @@ export const createUser = async(req, res) => {
         // console.log("Hashed Password:", hashedPassword);
         // Preparar datos del usuario
         const userData = {
-            role_id: 5, // Rol por defecto None
-            company_id,
             name,
             email,
             password_hash: hashedPassword, // Guarda como password_hash en la BBDD
+            active,
+            photo_url
         };
 
         // Insertar usuario

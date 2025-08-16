@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import usuarioRoutes from "./routes/userRoutes.js";
 import companyRoutes from "./routes/companyRoutes.js";
+import companyInvitationRoutes from "./routes/companyInvitationRoutes.js";
 
 dotenv.config();
 
@@ -12,8 +13,8 @@ app.use(express.json());
 // Rutas
 app.use("/users", usuarioRoutes);
 app.use("/companies", companyRoutes);
-
+app.use("/company-invitations", companyInvitationRoutes);
 // Servidor
 app.listen(process.env.PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`);
+    console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`);
 });

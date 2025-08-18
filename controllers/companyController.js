@@ -21,11 +21,9 @@ export const getCompanies = async(req, res) => {
 
 export const createCompany = async(req, res) => {
     try {
-        // Verificar JWT
         const decoded = verifyAuthToken(req, res);
         if (!decoded) return;
 
-        // Comprobar que el email del JWT existe en la base de datos
         const { data: user, error: userError } = await supabase
             .from(UserModel.table)
             .select("*")
@@ -38,7 +36,6 @@ export const createCompany = async(req, res) => {
 
         const { name, address, phone, email, photo_url } = req.body;
 
-        // Insertar la empresa
         const { data, error } = await supabase
             .from(CompanyModel.table)
             .insert([{ name, address, phone, email, photo_url }])
@@ -46,7 +43,6 @@ export const createCompany = async(req, res) => {
 
         if (error) throw error;
 
-        // Relacionar el usuario con la empresa recién creada (por ejemplo, en una tabla user_company)
         if (data && data.length > 0) {
             const companyId = data[0].id;
             await supabase
@@ -56,6 +52,38 @@ export const createCompany = async(req, res) => {
 
         res.status(201).json(data);
 
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+export const updateCompany = async(req, res) => {
+    try {
+        const decoded = verifyAuthToken(req, res);
+        if (!decoded) return;
+
+        const { data: user, error: userError } = await supabase
+            .from(UserModel.table)
+            .select("*")
+            .eq("email", decoded.email)
+            .single();
+
+        if (userError || !user) {
+            return res.status(403).json({ error: "User not found" });
+        }
+
+        const { id, name, address, phone, email, photo_url } = req.body;
+
+        const { data, error } = await supabase
+            .from(CompanyModel.table)
+            .update({ name, address, phone, email, photo_url })
+            .eq("id", id)
+            .select();
+
+        if (error) throw error;
+
+        res.status(200).json(data);
 
     } catch (error) {
         res.status(500).json({ error: error.message });

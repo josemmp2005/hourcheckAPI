@@ -1,6 +1,5 @@
 import supabase from "../config/supabase.js";
 import { CompanyInvitationModel } from "../models/companyInvitationModel.js";
-import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import dotenv from "dotenv";
 import { verifyAuthToken } from "../utils/jwt.js";
@@ -60,8 +59,8 @@ export const checkCompanyInvitation = async(req, res) => {
         return res.status(400).json({ error: "Invitation already accepted" });
     }
 
-    console.log("Invitation details:", invitation);
-    console.log("Decoded user details:", decoded);
+    // console.log("Invitation details:", invitation);
+    // console.log("Decoded user details:", decoded);
 
     if (invitation.status === "pending" && new Date(invitation.expires_at) > new Date() && invitation.email === decoded.email) {
         const userCompanyData = {
@@ -77,6 +76,16 @@ export const checkCompanyInvitation = async(req, res) => {
 
         if (error) {
             return res.status(500).json({ error: "Error accepting invitation" });
+        }
+
+        const { data: updateInvitation, error: updateError } = await supabase
+            .from(CompanyInvitationModel.table)
+            .update({ status: "accepted" })
+            .eq("id", invitation.id)
+            .select();
+
+        if (updateError) {
+            return res.status(500).json({ error: "Error updating invitation" });
         }
 
         return res.status(200).json({ message: "Invitation accepted", userCompany });

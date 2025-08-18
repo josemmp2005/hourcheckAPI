@@ -67,6 +67,27 @@ export const createUser = async(req, res) => {
     }
 };
 
+export const updateUser = async(req, res) => {
+    const { id } = req.params;
+    const { name, email, active, photo_url } = req.body;
+
+    try {
+        const { data, error } = await supabase
+            .from(UserModel.table)
+            .update({ name, email, active, photo_url })
+            .eq("id", id)
+            .select();
+
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            return res.status(404).json({ detail: "User not found" });
+        }
+
+        return res.status(200).json(data[0]);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
 
 export const loginUser = async(req, res) => {
     const { email, password_hash } = req.body;

@@ -22,17 +22,8 @@ export const getCompanies = async(req, res) => {
 export const createCompany = async(req, res) => {
     try {
         // Verificar JWT
-        const authHeader = req.headers.authorization;
-        if (!authHeader) {
-            return res.status(401).json({ error: "No token provided" });
-        }
-        const token = authHeader.split(" ")[1];
-        let decoded;
-        try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET);
-        } catch (err) {
-            return res.status(401).json({ error: "Invalid token" });
-        }
+        const decoded = verifyAuthToken(req, res);
+        if (!decoded) return;
 
         // Comprobar que el email del JWT existe en la base de datos
         const { data: user, error: userError } = await supabase

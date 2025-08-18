@@ -30,7 +30,6 @@ export const createUser = async(req, res) => {
         return res.status(500).json({ error: "HASH_SECRET must be a number in .env" });
     }
     try {
-        // Verificar si el usuario ya existe
         const { data: existingUser, error: selectError } = await supabase
             .from(UserModel.table)
             .select("*")
@@ -41,19 +40,17 @@ export const createUser = async(req, res) => {
             return res.status(400).json({ detail: "Email already registered" });
         }
 
-        const hashedPassword = await bcrypt.hash(password_hash, saltRounds); // Hashea el password recibido
-
+        const hashedPassword = await bcrypt.hash(password_hash, saltRounds);
         // console.log("Hashed Password:", hashedPassword);
-        // Preparar datos del usuario
+
         const userData = {
             name,
             email,
-            password_hash: hashedPassword, // Guarda como password_hash en la BBDD
+            password_hash: hashedPassword,
             active,
             photo_url
         };
 
-        // Insertar usuario
         const { data: insertData, error: insertError } = await supabase
             .from(UserModel.table)
             .insert([userData])
@@ -78,7 +75,6 @@ export const loginUser = async(req, res) => {
     }
 
     try {
-        // Buscar usuario por email
         const { data: user, error } = await supabase
             .from(UserModel.table)
             .select("*")
@@ -90,13 +86,11 @@ export const loginUser = async(req, res) => {
             return res.status(401).json({ detail: "Invalid credentials" });
         }
 
-        // Verificar contraseña
         const isPasswordValid = await bcrypt.compare(password_hash, user.password_hash);
         if (!isPasswordValid) {
             return res.status(401).json({ detail: "Invalid credentials" });
         }
 
-        // Generar JWT
         const token = jwt.sign({ id: user.id, name: user.name, email: user.email },
             process.env.JWT_SECRET, { expiresIn: "1h" }
         );

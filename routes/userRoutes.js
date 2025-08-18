@@ -4,7 +4,7 @@ import { getUsers, createUser, loginUser } from "../controllers/userController.j
 const router = express.Router();
 
 router.get("/", getUsers);
-router.post("/", createUser);
+router.post("/register", createUser);
 router.post("/login", loginUser);
 
 

@@ -3,22 +3,14 @@ import { CompanyInvitationModel } from "../models/companyInvitationModel.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import { verifyAuthToken } from "../utils/jwt.js";
 
 dotenv.config();
 
 export const createCompanyInvitation = async(req, res) => {
 
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ error: "No token provided" });
-    }
-    const token = authHeader.split(" ")[1];
-    let decoded;
-    try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
-        return res.status(401).json({ error: "Invalid token" });
-    }
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
 
     const { company_id, role_id, email } = req.body;
 
@@ -49,5 +41,46 @@ export const createCompanyInvitation = async(req, res) => {
 }
 
 export const checkCompanyInvitation = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
 
+    const { token } = req.body;
+
+    const { data: invitation, error } = await supabase
+        .from(CompanyInvitationModel.table)
+        .select("*")
+        .eq("token", token)
+        .single();
+
+    if (error || !invitation) {
+        return res.status(404).json({ error: "Invitation not found" });
+    }
+
+    if (invitation.status === "accepted") {
+        return res.status(400).json({ error: "Invitation already accepted" });
+    }
+
+    console.log("Invitation details:", invitation);
+    console.log("Decoded user details:", decoded);
+
+    if (invitation.status === "pending" && new Date(invitation.expires_at) > new Date() && invitation.email === decoded.email) {
+        const userCompanyData = {
+            user_id: decoded.id,
+            company_id: invitation.company_id,
+            role_id: invitation.role_id
+        }
+
+        const { data: userCompany, error } = await supabase
+            .from("user_companies")
+            .insert([userCompanyData])
+            .single();
+
+        if (error) {
+            return res.status(500).json({ error: "Error accepting invitation" });
+        }
+
+        return res.status(200).json({ message: "Invitation accepted", userCompany });
+    }
+
+    res.status(400).json({ error: "Invalid or expired invitation" });
 }

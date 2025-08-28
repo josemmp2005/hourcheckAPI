@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import usuarioRoutes from "./routes/userRoutes.js";
 import companyRoutes from "./routes/companyRoutes.js";
 import companyInvitationRoutes from "./routes/companyInvitationRoutes.js";
-import companyUserRoutes from "./routes/companyUserModel.js";
+import companyUserRoutes from "./routes/companyUserRoutes.js";
+import "./cronJobs.js";
 
 dotenv.config();
 

@@ -5,6 +5,9 @@ import companyRoutes from "./routes/companyRoutes.js";
 import companyInvitationRoutes from "./routes/companyInvitationRoutes.js";
 import companyUserRoutes from "./routes/companyUserRoutes.js";
 import clockInRoutes from "./routes/clockInRoutes.js";
+import breakRoutes from "./routes/breakRoutes.js";
+import absensenceRoutes from "./routes/absenceRoutes.js";
+import vacationRoutes from "./routes/vacationRoutes.js";
 import "./cronJobs.js";
 
 dotenv.config();
@@ -19,6 +22,9 @@ app.use("/companies", companyRoutes);
 app.use("/company-invitations", companyInvitationRoutes);
 app.use("/company-users", companyUserRoutes);
 app.use("/clock-in", clockInRoutes);
+app.use("/breaks", breakRoutes);
+app.use("/absences", absensenceRoutes);
+app.use("/vacations", vacationRoutes);
 
 // Servidor
 app.listen(process.env.PORT, () => {

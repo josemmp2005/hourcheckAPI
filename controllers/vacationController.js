@@ -1,7 +1,7 @@
-import supabase from "../config/supabase";
-import BreakModel from "../models/breakModel";
+import supabase from "../config/supabase.js";
+import BreakModel from "../models/breakModel.js";
 import dotenv from "dotenv";
-import { verifyAuthToken } from "../utils/jwt";
+import { verifyAuthToken } from "../utils/jwt.js";
 
 dotenv.config();
 

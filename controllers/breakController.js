@@ -1,12 +1,12 @@
 import supabase from '../config/supabase.js'
-import { breakModel } from '../models/breakModel.js'
+import { BreakModel } from '../models/breakModel.js'
 import dotenv from 'dotenv'
-import { verifyAuthtoken } from '../utils/jwt.js'
+import { verifyAuthToken } from '../utils/jwt.js'
 
 dotenv.config();
 
 export const startBreak = async(req, res) => {
-    const decoded = verifyAuthtoken(req, res);
+    const decoded = verifyAuthToken(req, res);
 
     if (!decoded) return;
 
@@ -14,7 +14,7 @@ export const startBreak = async(req, res) => {
 
     try {
         const { data, error } = await supabase
-            .from(breakModel)
+            .from(BreakModel)
             .insert([{ user_id, start_time: new Date() }]);
 
         if (error) throw error;
@@ -27,7 +27,7 @@ export const startBreak = async(req, res) => {
 }
 
 export const stopBreak = async(req, res) => {
-    const decoded = VerifyAuthtoken(req, res);
+    const decoded = verifyAuthToken(req, res);
 
     if (!decoded) return;
 
@@ -35,7 +35,7 @@ export const stopBreak = async(req, res) => {
 
     try {
         const { data, error } = await supabase
-            .from(breakModel)
+            .from(BreakModel)
             .update({ end_time: new Date() })
             .match({ user_id, end_time: null });
 

@@ -1,5 +1,5 @@
 import express from "express";
-import { startBreak, stopBreak } from "../controllers/breakController";
+import { startBreak, stopBreak } from "../controllers/breakController.js";
 
 const router = express.Router();
 

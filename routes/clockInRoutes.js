@@ -1,8 +1,9 @@
 import express from "express";
-import { clockIn } from "../controllers/clockInController.js";
+import { clockIn, clockOut } from "../controllers/clockInController.js";
 
 const router = express.Router();
 
-router.post("/clock-in", clockIn);
+router.post("/in", clockIn);
+router.post("/out", clockOut);
 
 export default router;

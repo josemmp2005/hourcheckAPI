@@ -1,11 +1,19 @@
-import supabase from supabase;
-import { ShiftModel } from "../models/shiftModel";
+import supabase from "../config/supabase.js";
+import { ShiftModel } from "../models/shiftModel.js";
 import dotenv from "dotenv";
 import { verifyAuthToken } from "../utils/jwt.js";
 
 dotenv.config();
 
 export const createShift = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    if (!decoded.role || decoded.role !== "admin") {
+        res.status(403).json({ message: "Forbidden" });
+        return;
+    }
+
     const { start_time, end_time, break_minutes } = req.body;
 
     try {

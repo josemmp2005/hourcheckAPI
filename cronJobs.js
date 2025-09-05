@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import supabase from "./config/supabase.js";
-import { generateDailyCode } from "./controllers/dailySingCodeController.js";
+import { generateDailyCode } from "./controllers/dailySigningCodeController.js";
 
 // Ejecuta todos los días a las 00:01
 // cron.schedule("* * * * *", async() => {

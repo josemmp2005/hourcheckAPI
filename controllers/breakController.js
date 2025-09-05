@@ -11,11 +11,12 @@ export const startBreak = async(req, res) => {
     if (!decoded) return;
 
     const { user_id } = decoded;
+    const clock_in_id = req.body.clock_in_id;
 
     try {
         const { data, error } = await supabase
-            .from(BreakModel)
-            .insert([{ user_id, start_time: new Date() }]);
+            .from(BreakModel.table)
+            .insert([{ clock_in_id, start_time: new Date() }]);
 
         if (error) throw error;
 
@@ -31,19 +32,19 @@ export const stopBreak = async(req, res) => {
 
     if (!decoded) return;
 
-    const { user_id } = decoded;
+    const clock_in_id = req.body.clock_in_id;
 
     try {
         const { data, error } = await supabase
-            .from(BreakModel)
+            .from(BreakModel.table)
             .update({ end_time: new Date() })
-            .match({ user_id, end_time: null });
+            .match({ clock_in_id });
 
         if (error) throw error;
 
-        res.status(200).json({ message: "Break stopped", data });
+        res.status(200).json({ message: "Break ended", data });
     } catch (error) {
-        console.error("Error stopping break:", error);
-        res.status(500).json({ message: "Error stopping break", error });
+        console.error("Error ending break:", error);
+        res.status(500).json({ message: "Error ending break", error });
     }
 }

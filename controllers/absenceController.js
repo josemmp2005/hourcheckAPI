@@ -13,8 +13,8 @@ export const createAbsence = async(req, res) => {
 
     try {
         const { data, error } = await supabase
-            .from(absenceModel)
-            .insert([{ user_id, start_time: new Date() }]);
+            .from(absenceModel.table)
+            .insert([{ user_id, ...req.body }]);
 
         if (error) throw error;
 

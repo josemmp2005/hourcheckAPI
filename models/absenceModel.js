@@ -7,6 +7,5 @@ export const absenceModel = {
         start_date: "date",
         end_date: "date",
         reason: "text",
-        created_at: "timestamp"
     }
 }

@@ -10,10 +10,16 @@ import absensenceRoutes from "./routes/absenceRoutes.js";
 import vacationRoutes from "./routes/vacationRoutes.js";
 import shiftRoutes from "./routes/shiftsRoutes.js";
 import "./cronJobs.js";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
+
+app.use(cors({
+    origin: "http://localhost:5173", // o "*" para permitir cualquier origen
+    credentials: true
+}));
 
 app.use(express.json());
 

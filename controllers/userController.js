@@ -3,6 +3,7 @@ import { UserModel } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import { verifyAuthToken } from "../utils/jwt.js";
 
 dotenv.config();
 
@@ -121,3 +122,25 @@ export const loginUser = async(req, res) => {
         return res.status(500).json({ error: error.message });
     }
 }
+
+export const getUserCompanies = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    try {
+        const { data, error } = await supabase
+            .from('user_companies')
+            .select('company_id, company(name)')
+            .eq('user_id', decoded.id);
+
+        if (error) throw error;
+
+        const companies = data.map(item => ({
+            id: item.company_id,
+            name: item.company.name
+        }));
+        res.status(200).json(companies);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching user companies", error });
+    }
+};

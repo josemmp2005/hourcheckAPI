@@ -13,6 +13,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.54.0",
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "cron": "^4.3.3",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.1",

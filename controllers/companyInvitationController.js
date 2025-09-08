@@ -11,7 +11,7 @@ export const createCompanyInvitation = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
 
-    const { company_id, role_id, email } = req.body;
+    const { company_id, role_id, email, work_mode_id } = req.body;
 
     const invited_by = decoded.id;
 
@@ -21,6 +21,7 @@ export const createCompanyInvitation = async(req, res) => {
     const newInviation = {
         company_id: company_id,
         role_id: role_id,
+        work_mode_id: work_mode_id,
         email: email,
         invited_by: invited_by,
         status: "pending",
@@ -66,7 +67,8 @@ export const checkCompanyInvitation = async(req, res) => {
         const userCompanyData = {
             user_id: decoded.id,
             company_id: invitation.company_id,
-            role_id: invitation.role_id
+            role_id: invitation.role_id,
+            work_mode_id: invitation.work_mode_id,
         }
 
         const { data: userCompany, error } = await supabase

@@ -4,20 +4,27 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { verifyAuthToken } from "../utils/jwt.js";
+import { OAuth2Client } from "google-auth-library";
 
 dotenv.config();
 
-export const getUsers = async(req, res) => {
+export const getUser = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
     try {
         const { data, error } = await supabase
             .from(UserModel.table)
-            .select("*");
-
+            .select("name, email, active, photo_url")
+            .eq("id", decoded.id)
+            .single();
         if (error) throw error;
-
-        res.status(200).json(data);
+        if (!data) {
+            return res.status(404).json({ detail: "User not found" });
+        }
+        return res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
 };
 
@@ -123,6 +130,53 @@ export const loginUser = async(req, res) => {
     }
 }
 
+export const loginUserGoogle = async(req, res) => {
+    const { id_token } = req.body;
+    if (!id_token) {
+        return res.status(400).json({ error: "Google token is required" });
+    }
+
+    try {
+        // Verifica el token de Google
+        const ticket = await client.verifyIdToken({
+            idToken: id_token,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+        const payload = ticket.getPayload();
+        const email = payload.email;
+        const name = payload.name;
+        const photo_url = payload.picture;
+
+        // Busca el usuario en la base de datos
+        const { data: user, error } = await supabase
+            .from(UserModel.table)
+            .select("*")
+            .eq("email", email)
+            .single();
+
+        let userId;
+        if (!user) {
+            // Si no existe, crea el usuario
+            const { data: newUser, error: insertError } = await supabase
+                .from(UserModel.table)
+                .insert([{ name, email, photo_url, active: true }])
+                .select()
+                .single();
+            if (insertError) throw insertError;
+            userId = newUser.id;
+        } else {
+            userId = user.id;
+        }
+
+        // Genera el JWT
+        const token = jwt.sign({ id: userId, name, email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+        return res.status(200).json({ token });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 export const getUserCompanies = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
@@ -130,17 +184,24 @@ export const getUserCompanies = async(req, res) => {
     try {
         const { data, error } = await supabase
             .from('user_companies')
-            .select('company_id, company(name)')
+            .select('company_id')
             .eq('user_id', decoded.id);
 
         if (error) throw error;
 
-        const companies = data.map(item => ({
-            id: item.company_id,
-            name: item.company.name
-        }));
-        res.status(200).json(companies);
+        for (let i = 0; i < data.length; i++) {
+            const companyId = data[i].company_id;
+            const { data: companyData, error: companyError } = await supabase
+                .from('companies')
+                .select('*')
+                .eq('id', companyId)
+                .single();
+            if (companyError) throw companyError;
+            data[i].company = companyData;
+        }
+        res.status(200).json(data);
+
     } catch (error) {
-        res.status(500).json({ message: "Error fetching user companies", error });
+        res.status(500).json({ error: error.message });
     }
 };

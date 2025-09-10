@@ -1,20 +1,30 @@
 import supabase from "../config/supabase.js";
-import jwt from "jsonwebtoken";
 import { CompanyModel } from "../models/companyModel.js";
 import { UserModel } from "../models/userModel.js";
+import { verifyAuthToken } from "../utils/jwt.js";
 
 
-export const getCompanies = async(req, res) => {
+export const getCompanie = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    const companyId = req.body.id;
+
+    console.log("Decoded Token:", decoded);
+
     try {
         const { data, error } = await supabase
             .from(CompanyModel.table)
-            .select("*");
-
+            .select("*")
+            .eq("id", companyId)
+            .single();
         if (error) throw error;
-
-        res.status(200).json(data);
+        if (!data) {
+            return res.status(404).json({ detail: "Company not found" });
+        }
+        return res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
 };
 

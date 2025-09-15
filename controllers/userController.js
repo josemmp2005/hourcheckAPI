@@ -205,3 +205,31 @@ export const getUserCompanies = async(req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+export const getUserCompanyInfo = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    const companyId = req.body.id;
+
+    try {
+        const { data, error } = await supabase
+            .from('user_companies')
+            .select('role_id, work_mode_id')
+            .eq('user_id', decoded.id)
+            .eq('company_id', companyId)
+            .single();
+
+        if (error) throw error;
+
+        if (!data) {
+            return res.status(404).json({ detail: "User-Company relation not found" });
+        }
+
+
+        return res.status(200).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}

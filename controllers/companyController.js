@@ -4,7 +4,7 @@ import { UserModel } from "../models/userModel.js";
 import { verifyAuthToken } from "../utils/jwt.js";
 
 
-export const getCompanie = async(req, res) => {
+export const getCompany = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
 

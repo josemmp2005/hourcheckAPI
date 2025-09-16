@@ -3,8 +3,10 @@ import { CompanyInvitationModel } from "../models/companyInvitationModel.js";
 import crypto from "crypto";
 import dotenv from "dotenv";
 import { verifyAuthToken } from "../utils/jwt.js";
+import { sendInvitationEmail } from "../utils/sendInvitationEmail.js";
 
 dotenv.config();
+
 
 export const createCompanyInvitation = async(req, res) => {
 
@@ -28,6 +30,19 @@ export const createCompanyInvitation = async(req, res) => {
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000)
     }
 
+    try {
+        const checkAvaibleEmail = await supabase
+            .from("user")
+            .select("email")
+            .eq("email", email)
+            .single();
+        if (!checkAvaibleEmail.data) {
+            return res.status(400).json({ error: "User with this email does not exist" });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+
     const invitation = await supabase
         .from(CompanyInvitationModel.table)
         .insert([{...newInviation, token: invitationToken }])
@@ -37,7 +52,14 @@ export const createCompanyInvitation = async(req, res) => {
         return res.status(500).json({ error: "Error creating invitation" });
     }
 
-    res.status(201).json({ message: "Invitation created", invitation });
+    // Enviar email de invitación
+    try {
+        await sendInvitationEmail(email, invitationToken);
+    } catch (mailError) {
+        return res.status(500).json({ error: "Invitation created but email failed to send", mailError });
+    }
+
+    res.status(201).json({ message: "Invitation created and email sent", invitation });
 }
 
 export const checkCompanyInvitation = async(req, res) => {

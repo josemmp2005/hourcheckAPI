@@ -8,6 +8,8 @@ import { OAuth2Client } from "google-auth-library";
 
 dotenv.config();
 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 export const getUser = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
@@ -133,6 +135,7 @@ export const loginUser = async(req, res) => {
 export const loginUserGoogle = async(req, res) => {
     const { id_token } = req.body;
     if (!id_token) {
+        console.log("No id_token recibido");
         return res.status(400).json({ error: "Google token is required" });
     }
 
@@ -143,6 +146,8 @@ export const loginUserGoogle = async(req, res) => {
             audience: process.env.GOOGLE_CLIENT_ID
         });
         const payload = ticket.getPayload();
+        console.log("Payload de Google:", payload);
+
         const email = payload.email;
         const name = payload.name;
         const photo_url = payload.picture;
@@ -154,6 +159,8 @@ export const loginUserGoogle = async(req, res) => {
             .eq("email", email)
             .single();
 
+        if (error) console.log("Error buscando usuario:", error);
+
         let userId;
         if (!user) {
             // Si no existe, crea el usuario
@@ -162,7 +169,10 @@ export const loginUserGoogle = async(req, res) => {
                 .insert([{ name, email, photo_url, active: true }])
                 .select()
                 .single();
-            if (insertError) throw insertError;
+            if (insertError) {
+                console.log("Error insertando usuario:", insertError);
+                throw insertError;
+            }
             userId = newUser.id;
         } else {
             userId = user.id;
@@ -173,6 +183,7 @@ export const loginUserGoogle = async(req, res) => {
 
         return res.status(200).json({ token });
     } catch (error) {
+        console.error("Error en loginUserGoogle:", error);
         return res.status(500).json({ error: error.message });
     }
 }

@@ -19,7 +19,6 @@ export const createCompanyInvitation = async(req, res) => {
 
     const invitationToken = crypto.randomBytes(32).toString("hex");
 
-
     const newInviation = {
         company_id: company_id,
         role_id: role_id,
@@ -32,7 +31,7 @@ export const createCompanyInvitation = async(req, res) => {
 
     try {
         const checkAvaibleEmail = await supabase
-            .from("user")
+            .from("users")
             .select("email")
             .eq("email", email)
             .single();

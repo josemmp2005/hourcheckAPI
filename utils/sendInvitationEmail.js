@@ -11,7 +11,7 @@ export const sendInvitationEmail = async(to, invitationToken) => {
         }
     });
 
-    const invitationUrl = `http://localhost:5173/invitation/accept?token=${invitationToken}`;
+    const invitationUrl = `http://localhost:5173/invitation?token=${invitationToken}`;
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to,

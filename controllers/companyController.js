@@ -99,3 +99,33 @@ export const updateCompany = async(req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const getEmployeesByCompany = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    const companyId = req.body.company_id;
+
+    try {
+        const { data, error } = await supabase
+            .from("user_companies")
+            .select(`user_id, role_id, work_mode_id`)
+            .eq("company_id", companyId);
+        if (error) throw error;
+
+        for (let i = 0; i < data.length; i++) {
+            const userId = data[i].user_id;
+            const { data: userData, error: userError } = await supabase
+                .from('users')
+                .select('id, name, email, photo_url')
+                .eq('id', userId)
+                .single();
+            if (userError) throw userError;
+            data[i].user = userData;
+        }
+        res.status(200).json(data);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}

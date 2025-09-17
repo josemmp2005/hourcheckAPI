@@ -9,6 +9,8 @@ import breakRoutes from "./routes/breakRoutes.js";
 import absensenceRoutes from "./routes/absenceRoutes.js";
 import vacationRoutes from "./routes/vacationRoutes.js";
 import shiftRoutes from "./routes/shiftsRoutes.js";
+import roleRoutes from "./routes/roleRoutes.js";
+import workModeRoutes from "./routes/workModeRoutes.js";
 import "./cronJobs.js";
 import cors from "cors";
 
@@ -33,6 +35,8 @@ app.use("/breaks", breakRoutes);
 app.use("/absences", absensenceRoutes);
 app.use("/vacations", vacationRoutes);
 app.use("/shifts", shiftRoutes);
+app.use("/roles", roleRoutes);
+app.use("/work-modes", workModeRoutes);
 
 // Servidor
 app.listen(process.env.PORT, () => {

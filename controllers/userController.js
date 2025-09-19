@@ -78,14 +78,21 @@ export const createUser = async(req, res) => {
 };
 
 export const updateUser = async(req, res) => {
-    const { id } = req.params;
-    const { name, email, active, photo_url } = req.body;
+    const { name, password_hash, photo_url, email } = req.body;
+
+    let updateData = { name, photo_url };
+
+    // Solo hashear si password_hash es un string no vacío
+    if (typeof password_hash === "string" && password_hash.trim().length > 0) {
+        const saltRounds = parseInt(process.env.HASH_SECRET);
+        updateData.password_hash = await bcrypt.hash(password_hash, saltRounds);
+    }
 
     try {
         const { data, error } = await supabase
             .from(UserModel.table)
-            .update({ name, email, active, photo_url })
-            .eq("id", id)
+            .update(updateData)
+            .eq("email", email)
             .select();
 
         if (error) throw error;

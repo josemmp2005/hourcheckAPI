@@ -4,6 +4,8 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import { verifyAuthToken } from "../utils/jwt.js";
 import { sendInvitationEmail } from "../utils/sendInvitationEmail.js";
+import bcrypt from "bcrypt";
+import { UserModel } from "../models/userModel.js";
 
 dotenv.config();
 
@@ -28,6 +30,8 @@ export const createCompanyInvitation = async(req, res) => {
         status: "pending",
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000)
     }
+
+    // console.log(newInviation);
 
     try {
         const checkAvaibleEmail = await supabase
@@ -64,7 +68,7 @@ export const createCompanyInvitation = async(req, res) => {
 export const checkCompanyInvitation = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
-
+    console.log(decoded.email)
     const { token } = req.body;
 
     const { data: invitation, error } = await supabase

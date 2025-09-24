@@ -9,7 +9,7 @@ export const clockIn = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
 
-    const { code, companyId, work_mode_id } = req.body;
+    const { code, company_id, work_mode_id } = req.body;
     const date = new Date().toISOString().split('T')[0];
 
     if (!code) {
@@ -42,7 +42,7 @@ export const clockIn = async(req, res) => {
             work_mode_id: work_mode_id,
             check_in: new Date(),
             check_out: null,
-            company_id: companyId
+            company_id: company_id
         };
 
         const { data: insertData, error: insertError } = await supabase

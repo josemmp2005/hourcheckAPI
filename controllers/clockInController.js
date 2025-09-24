@@ -111,6 +111,8 @@ export const clockOut = async(req, res) => {
 
 export const checkClockInStatus = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
+    const companyId = req.params.companyId;
+
     if (!decoded) return;
 
     const { id } = decoded;
@@ -120,6 +122,7 @@ export const checkClockInStatus = async(req, res) => {
             .from('clock_ins')
             .select('*')
             .eq('user_id', id)
+            .eq('company_id', companyId)
             .gte('check_in', today + ' 00:00:00')
             .lte('check_in', today + ' 23:59:59')
             .single();

@@ -10,6 +10,7 @@ export const clockIn = async(req, res) => {
     if (!decoded) return;
 
     const code = req.body.code;
+    const date = new Date().toISOString().split('T')[0];
 
     if (!code) {
         return res.status(400).json({ error: 'Code is required' });
@@ -19,7 +20,8 @@ export const clockIn = async(req, res) => {
         const { data, error } = await supabase
             .from('daily_signing_codes')
             .select('*')
-            .eq('code', code);
+            .eq('code', code)
+            .eq('date', date);
 
         if (error) {
             return res.status(400).json({ error: error.message });

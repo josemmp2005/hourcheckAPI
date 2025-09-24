@@ -67,7 +67,7 @@ export const clockOut = async(req, res) => {
     if (!decoded) return;
 
     const { id } = decoded;
-    const companyId = req.body.companyId;
+    const companyId = req.body.company_id;
 
     if (!companyId) {
         return res.status(400).json({ error: 'Company ID is required' });

@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post("/in", clockIn);
 router.post("/out", clockOut);
-router.get("/status", checkClockInStatus);
+router.get("/status/:companyId", checkClockInStatus);
 
 export default router;

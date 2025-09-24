@@ -9,7 +9,7 @@ export const clockIn = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
 
-    const code = req.body.code;
+    const { code, companyId, work_mode_id } = req.body;
     const date = new Date().toISOString().split('T')[0];
 
     if (!code) {
@@ -39,9 +39,10 @@ export const clockIn = async(req, res) => {
 
         const clockIn = {
             user_id: decoded.id,
-            work_mode_id: 1, // ejemplo 
+            work_mode_id: work_mode_id,
             check_in: new Date(),
-            check_out: null
+            check_out: null,
+            company_id: companyId
         };
 
         const { data: insertData, error: insertError } = await supabase
@@ -66,13 +67,18 @@ export const clockOut = async(req, res) => {
     if (!decoded) return;
 
     const { id } = decoded;
+    const companyId = req.body.companyId;
 
+    if (!companyId) {
+        return res.status(400).json({ error: 'Company ID is required' });
+    }
     try {
         const today = new Date().toISOString().split('T')[0];
         const { data, error } = await supabase
             .from('clock_ins')
             .select('*')
             .eq('user_id', id)
+            .eq('company_id', companyId)
             .is('check_out', null)
             .gte('check_in', today + ' 00:00:00')
             .lte('check_in', today + ' 23:59:59')

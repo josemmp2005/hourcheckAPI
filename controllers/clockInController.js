@@ -108,3 +108,30 @@ export const clockOut = async(req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export const checkClockInStatus = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    const { id } = decoded;
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const { data, error } = await supabase
+            .from('clock_ins')
+            .select('*')
+            .eq('user_id', id)
+            .gte('check_in', today + ' 00:00:00')
+            .lte('check_in', today + ' 23:59:59')
+            .single();
+        if (error && error.code !== 'PGRST116') {
+            return res.status(400).json({ error: error.message });
+        }
+        if (!data) {
+            return res.status(200).json({ clockedIn: false });
+        }
+        return res.status(200).json({ clockedIn: true, data });
+    } catch (error) {
+        console.error('Error checking clock-in status:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}

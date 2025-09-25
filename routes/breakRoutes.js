@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post("/start", startBreak);
 router.post("/stop", stopBreak);
-router.post("/status/:company_id", breakStatus);
+router.get("/status/:company_id", breakStatus);
 
 
 export default router;

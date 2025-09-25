@@ -37,15 +37,15 @@ export const clockIn = async(req, res) => {
             return res.status(400).json({ error: 'Code is not valid for today' });
         }
 
-        const checkIn = new Date(),
+        const checkIn = new Date();
 
-            const clockIn = {
-                user_id: decoded.id,
-                work_mode_id: work_mode_id,
-                check_in: checkIn,
-                check_out: null,
-                company_id: company_id
-            };
+        const clockIn = {
+            user_id: decoded.id,
+            work_mode_id: work_mode_id,
+            check_in: checkIn,
+            check_out: null,
+            company_id: company_id
+        };
 
         const { data: insertData, error: insertError } = await supabase
             .from('clock_ins')

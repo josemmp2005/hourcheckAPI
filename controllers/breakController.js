@@ -53,7 +53,7 @@ export const breakStatus = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
 
-    const companyId = req.body.company_id;
+    const companyId = req.params.company_id;
 
     try {
         const { data, error } = await supabase

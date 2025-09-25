@@ -119,7 +119,7 @@ export const clockOut = async(req, res) => {
 
 export const checkClockInStatus = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
-    const companyId = req.params.company_id;
+    const companyId = req.params.companyId;
 
     if (!decoded) return;
 

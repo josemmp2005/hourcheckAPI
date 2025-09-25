@@ -37,13 +37,15 @@ export const clockIn = async(req, res) => {
             return res.status(400).json({ error: 'Code is not valid for today' });
         }
 
-        const clockIn = {
-            user_id: decoded.id,
-            work_mode_id: work_mode_id,
-            check_in: new Date(),
-            check_out: null,
-            company_id: company_id
-        };
+        const checkIn = new Date(),
+
+            const clockIn = {
+                user_id: decoded.id,
+                work_mode_id: work_mode_id,
+                check_in: checkIn,
+                check_out: null,
+                company_id: company_id
+            };
 
         const { data: insertData, error: insertError } = await supabase
             .from('clock_ins')
@@ -55,7 +57,7 @@ export const clockIn = async(req, res) => {
             return res.status(400).json({ error: insertError.message });
         }
 
-        return res.status(200).json({ message: 'Clocked in successfully', data: insertData });
+        return res.status(200).json({ message: 'Clocked in successfully at ' + checkIn, data: insertData });
     } catch (error) {
         console.error('Error clocking in:', error);
         return res.status(500).json({ error: 'Internal server error' });

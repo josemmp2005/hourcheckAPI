@@ -20,7 +20,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: ["http://localhost:5173", "https://hourcheck.netlify.app", "http://192.168.1.38:5173", "https://deviable-nguyet-gamesomely.ngrok-free.dev/"], // Añade aquí la IP local
+    origin: ["http://localhost:5173", "https://hourcheck.netlify.app", "http://192.168.1.38:5173", "https://deviable-nguyet-gamesomely.ngrok-free.dev"], // Añade aquí la IP local
     credentials: true
 }));
 

@@ -10,7 +10,7 @@ export const requestVacation = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
 
-    const { user_id, leave_type_id, start_date, end_date, status } = req.body;
+    const { user_id, leave_type_id, start_date, end_date } = req.body;
 
     const { data, error } = await supabase
         .from(VacationModel.table)
@@ -19,7 +19,7 @@ export const requestVacation = async(req, res) => {
             leave_type_id,
             start_date,
             end_date,
-            status,
+            status: "pending",
             created_at: new Date()
         }]);
 

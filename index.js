@@ -12,6 +12,7 @@ import shiftRoutes from "./routes/shiftsRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
 import workModeRoutes from "./routes/workModeRoutes.js";
 import dailySigningCodeRoutes from "./routes/dailySingingCodeRoutes.js";
+import leavesTypesRoutes from "./routes/leavesTypesRoutes.js";
 import "./cronJobs.js";
 import cors from "cors";
 
@@ -39,6 +40,7 @@ app.use("/shifts", shiftRoutes);
 app.use("/roles", roleRoutes);
 app.use("/work-modes", workModeRoutes);
 app.use("/daily-singing-code", dailySigningCodeRoutes);
+app.use("/leave-types", leavesTypesRoutes);
 
 // Servidor
 app.listen(process.env.PORT, () => {

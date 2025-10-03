@@ -87,13 +87,18 @@ export const getEmployeeShift = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
 
-    const { user_id, company_id } = req.params;
+    const { employee_id, company_id } = req.params;
+
+
+    if (!company_id || !employee_id) {
+        return res.status(400).json({ error: "company_id and employee_id are required" });
+    }
 
     try {
         const { data, error } = await supabase
             .from("user_shifts")
             .select("*")
-            .eq("user_id", user_id)
+            .eq("user_id", employee_id)
             .eq("company_id", company_id)
             .single();
         if (error) throw error;

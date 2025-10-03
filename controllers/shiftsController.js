@@ -82,3 +82,23 @@ export const getEmployeesShifts = async(req, res) => {
         res.status(500).json({ message: "Error retrieving employee shifts", error });
     }
 }
+
+export const getEmployeeShift = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    const { user_id, company_id } = req.params;
+
+    try {
+        const { data, error } = await supabase
+            .from("user_shifts")
+            .select("*")
+            .eq("user_id", user_id)
+            .eq("company_id", company_id)
+            .single();
+        if (error) throw error;
+        res.status(200).json({ data });
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving employee shift", error });
+    }
+}

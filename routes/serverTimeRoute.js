@@ -1,7 +1,7 @@
 import express from "express";
 
 const router = express.Router();
-router.get('/server-time', (req, res) => {
+router.get('/', (req, res) => {
     res.json({
         timestamp: new Date().toISOString(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone

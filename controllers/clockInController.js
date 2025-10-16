@@ -152,12 +152,14 @@ export const getClockToday = async(req, res) => {
     if (!decoded) return;
 
     const { id } = decoded;
+    const companyId = req.body.company_id;
 
     try {
         const { data, error } = await supabase
             .from('clock_ins')
             .select('*')
             .eq('user_id', id)
+            .eq('company_id', companyId)
             .gte('check_in', new Date().toISOString().split('T')[0] + ' 00:00:00')
             .order('check_in', { ascending: false });
         if (error) {

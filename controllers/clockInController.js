@@ -146,3 +146,26 @@ export const checkClockInStatus = async(req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+export const getClockToday = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    const { id } = decoded;
+
+    try {
+        const { data, error } = await supabase
+            .from('clock_ins')
+            .select('*')
+            .eq('user_id', id)
+            .gte('check_in', new Date().toISOString().split('T')[0] + ' 00:00:00')
+            .order('check_in', { ascending: false });
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+        return res.status(200).json({ data });
+    } catch (error) {
+        console.error('Error fetching clock-in history:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}

@@ -196,3 +196,37 @@ export const getClockHistory = async(req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+export const getLastThreeClocks = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+
+    const { id } = decoded;
+    const companyId = req.body.company_id;
+
+    if (!companyId) {
+        return res.status(400).json({ error: 'Company ID is required' });
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('clock_ins')
+            .select('*')
+            .eq('user_id', id)
+            .eq('company_id', companyId)
+            .order('check_in', { ascending: false })
+            .limit(3);
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        return res.status(200).json({
+            message: 'Last 3 clock records retrieved successfully',
+            data
+        });
+    } catch (error) {
+        console.error('Error fetching last 3 clocks:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}

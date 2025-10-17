@@ -47,7 +47,6 @@ export const stopBreak = async(req, res) => {
         res.status(500).json({ message: "Error ending break", error });
     }
 }
-
 export const breakStatus = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
@@ -55,22 +54,26 @@ export const breakStatus = async(req, res) => {
     const companyId = req.params.company_id;
 
     try {
+        const today = new Date().toISOString().split("T")[0]; // 'YYYY-MM-DD'
+
         const { data, error } = await supabase
             .from("clock_ins")
             .select("*")
             .eq("user_id", decoded.id)
             .eq("company_id", companyId)
-            .eq("created_at", new Date().toISOString().split("T")[0] + " 00:00:00")
+            .gte("check_in", today + " 00:00:00")
+            .lt("check_in", today + " 23:59:59")
             .is("check_out", null)
             .order("check_in", { ascending: false })
             .limit(1);
+
+        console.log("Clock-in data:", data);
 
         if (error) {
             console.error("Supabase error:", error);
             return res.status(500).json({ message: "Error fetching break status", error });
         }
 
-        // Corrige esta validación
         if (!data || data.length === 0) {
             console.log("No active clock-in found for user");
             return res.status(404).json({ message: "No active clock-in found" });

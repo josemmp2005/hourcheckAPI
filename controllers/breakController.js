@@ -48,7 +48,6 @@ export const stopBreak = async(req, res) => {
     }
 }
 
-
 export const breakStatus = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
@@ -61,16 +60,19 @@ export const breakStatus = async(req, res) => {
             .select("*")
             .eq("user_id", decoded.id)
             .eq("company_id", companyId)
+            .eq("created_at", new Date().toISOString().split("T")[0] + " 00:00:00")
             .is("check_out", null)
             .order("check_in", { ascending: false })
             .limit(1);
-
 
         if (error) {
             console.error("Supabase error:", error);
             return res.status(500).json({ message: "Error fetching break status", error });
         }
-        if (data.length === 0) {
+
+        // Corrige esta validación
+        if (!data || data.length === 0) {
+            console.log("No active clock-in found for user");
             return res.status(404).json({ message: "No active clock-in found" });
         }
 
@@ -83,13 +85,16 @@ export const breakStatus = async(req, res) => {
             .is("end_time", null)
             .order("start_time", { ascending: false })
             .limit(1);
+
         if (breakError) {
             console.error("Supabase error:", breakError);
             return res.status(500).json({ message: "Error fetching break status", error: breakError });
         }
+
         if (breakData.length === 0) {
             return res.status(200).json({ onBreak: false });
         }
+
         return res.status(200).json({ onBreak: true, breakData: breakData[0] });
     } catch (error) {
         console.error("Error fetching break status:", error);

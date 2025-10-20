@@ -47,6 +47,7 @@ export const stopBreak = async(req, res) => {
         res.status(500).json({ message: "Error ending break", error });
     }
 }
+
 export const breakStatus = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
@@ -67,7 +68,7 @@ export const breakStatus = async(req, res) => {
             .order("check_in", { ascending: false })
             .limit(1);
 
-        console.log("Clock-in data:", data);
+        // console.log("Clock-in data:", data);
 
         if (error) {
             console.error("Supabase error:", error);

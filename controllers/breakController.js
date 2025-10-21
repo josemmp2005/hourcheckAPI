@@ -105,3 +105,33 @@ export const breakStatus = async(req, res) => {
         res.status(500).json({ message: "Error fetching break status", error });
     }
 }
+
+export const getMinutesBreakToday = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+    const { id } = decoded;
+    const clock_in_id = req.params.clock_in_id;
+
+    try {
+        const { data, error } = await supabase
+            .from(BreakModel.table)
+            .select("*")
+            .eq("clock_in_id", clock_in_id);
+
+        if (error) throw error;
+        console.log(data);
+        let totalMinutes = 0;
+        data.forEach(breakEntry => {
+            if (breakEntry.end_time) {
+                const start = new Date(breakEntry.start_time);
+                const end = new Date(breakEntry.end_time);
+                const diffMs = end - start;
+                const diffMins = Math.floor(diffMs / 60000); // Convert ms to minutes
+                totalMinutes += diffMins;
+            }
+        });
+        res.status(200).json({ totalMinutes });
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving break minutes", error });
+    }
+}

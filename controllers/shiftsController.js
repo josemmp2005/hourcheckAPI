@@ -89,7 +89,6 @@ export const getEmployeeShift = async(req, res) => {
 
     const { employee_id, company_id } = req.params;
 
-
     if (!company_id || !employee_id) {
         return res.status(400).json({ error: "company_id and employee_id are required" });
     }
@@ -101,9 +100,24 @@ export const getEmployeeShift = async(req, res) => {
             .eq("user_id", employee_id)
             .eq("company_id", company_id)
             .single();
+
         if (error) throw error;
-        res.status(200).json({ data });
+        // console.log("User shift data:", data);
+        // console.log("Shift ID:", data.shift_id);
+
+        // Corrige la destructuración aquí
+        const { data: shiftData, error: shiftError } = await supabase
+            .from(ShiftModel.table)
+            .select("*")
+            .eq("id", data.shift_id)
+            .single();
+
+        if (shiftError) throw shiftError;
+        // console.log("Shift data:", shiftData);
+
+        res.status(200).json({ shift: shiftData });
     } catch (error) {
+        console.error("Error details:", error);
         res.status(500).json({ message: "Error retrieving employee shift", error });
     }
 }

@@ -231,56 +231,56 @@ export const getLastThreeClocks = async(req, res) => {
     }
 }
 
-// export const getMinutesWorkedToday = async(req, res) => {
-//     const decoded = verifyAuthToken(req, res);
-//     if (!decoded) return;
-//     const { id } = decoded;
-//     const companyId = req.body.company_id;
+export const getMinutesWorkedToday = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+    const { id } = decoded;
+    const companyId = req.body.company_id;
 
-//     try {
-//         const today = new Date().toISOString().split('T')[0];
-//         const { data, error } = await supabase
-//             .from('clock_ins')
-//             .select('*')
-//             .eq('user_id', id)
-//             .eq('company_id', companyId)
-//             .gte('check_in', today + ' 00:00:00')
-//             .lte('check_in', today + ' 23:59:59');
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const { data, error } = await supabase
+            .from('clock_ins')
+            .select('*')
+            .eq('user_id', id)
+            .eq('company_id', companyId)
+            .gte('check_in', today + ' 00:00:00')
+            .lte('check_in', today + ' 23:59:59');
 
-//         if (error) {
-//             return res.status(400).json({ error: error.message });
-//         }
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
 
-//         // Calcular los minutos trabajados
-//         let totalMinutes = 0;
-//         const now = new Date(); // Hora actual
+        // Calcular los minutos trabajados
+        let totalMinutes = 0;
+        const now = new Date(); // Hora actual
 
-//         data.forEach(record => {
-//             const checkIn = new Date(record.check_in); // Crear Date directamente del string
-//             let checkOut;
+        data.forEach(record => {
+            const checkIn = new Date(record.check_in); // Crear Date directamente del string
+            let checkOut;
 
-//             if (record.check_out) {
-//                 checkOut = new Date(record.check_out); // Crear Date directamente del string
-//             } else {
-//                 // Si check_out es null, usa la hora actual
-//                 checkOut = now;
-//             }
+            if (record.check_out) {
+                checkOut = new Date(record.check_out); // Crear Date directamente del string
+            } else {
+                // Si check_out es null, usa la hora actual
+                checkOut = now;
+            }
 
-//             const diff = checkOut - checkIn; // diferencia en milisegundos
-//             const minutes = Math.floor(diff / (1000 * 60)); // convertir a minutos
-//             totalMinutes += minutes;
-//         });
+            const diff = checkOut - checkIn; // diferencia en milisegundos
+            const minutes = Math.floor(diff / (1000 * 60)); // convertir a minutos
+            totalMinutes += minutes;
+        });
 
-//         console.log(`Total minutes worked today for user ${id}: ${totalMinutes}`);
-//         console.log(data);
+        console.log(`Total minutes worked today for user ${id}: ${totalMinutes}`);
+        console.log(data);
 
-//         return res.status(200).json({
-//             totalMinutes,
-//             records: data.length,
-//             message: `Total minutes worked today: ${totalMinutes}`
-//         });
-//     } catch (error) {
-//         console.error('Error calculating minutes worked today:', error);
-//         return res.status(500).json({ error: 'Internal server error' });
-//     }
-// }
+        return res.status(200).json({
+            totalMinutes,
+            records: data.length,
+            message: `Total minutes worked today: ${totalMinutes}`
+        });
+    } catch (error) {
+        console.error('Error calculating minutes worked today:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}

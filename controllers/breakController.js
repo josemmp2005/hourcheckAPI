@@ -7,6 +7,7 @@ dotenv.config();
 
 export const startBreak = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
+    const { id } = decoded;
 
     if (!decoded) return;
 
@@ -15,7 +16,7 @@ export const startBreak = async(req, res) => {
     try {
         const { data, error } = await supabase
             .from(BreakModel.table)
-            .insert([{ clock_in_id, start_time: new Date() }]);
+            .insert([{ clock_in_id, start_time: new Date(), user_id: id }]);
 
         if (error) throw error;
 
@@ -133,5 +134,41 @@ export const getMinutesBreakToday = async(req, res) => {
         res.status(200).json({ totalMinutes });
     } catch (error) {
         res.status(500).json({ message: "Error retrieving break minutes", error });
+    }
+}
+
+export const getBreaksHistory = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+    const { id } = decoded;
+
+    try {
+        const { data, error } = await supabase
+            .from(BreakModel.table)
+            .select("*")
+            .eq("user_id", id)
+            .order("start_time", { ascending: false });
+        if (error) throw error;
+        res.status(200).json({ data });
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving breaks history", error });
+    }
+}
+
+export const getLastThreeBreaks = async(req, res) => {
+    const decoded = verifyAuthToken(req, res);
+    if (!decoded) return;
+    const { id } = decoded;
+    try {
+        const { data, error } = await supabase
+            .from(BreakModel.table)
+            .select("*")
+            .eq("user_id", id)
+            .order("start_time", { ascending: false })
+            .limit(3);
+        if (error) throw error;
+        res.status(200).json({ data });
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving last three breaks", error });
     }
 }

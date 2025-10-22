@@ -57,7 +57,7 @@ export const getLastsVacationUserRequest = async(req, res) => {
     const decoded = verifyAuthToken(req, res);
     if (!decoded) return;
     const userId = decoded.id;
-    const companyId = req.params.company_id;
+    const companyId = req.body.company_id;
     try {
         const { data, error } = await supabase
             .from(VacationModel.table)
